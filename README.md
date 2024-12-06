@@ -46,7 +46,7 @@ Mean Absolute Percentage Error (MAPE)
 R² score (via sklearn metrics).
 
 # Results
-Visualizations and tabular results highlight historical trends and future forecasts. Key findings are summarized in the notebooks.
+Visualizations and tabular results highlight historical trends and future forecasts. Key findings are summarized in the notebook.
 
 # Run Jupyter Notebooks:
 daily_forecasting.ipynb
