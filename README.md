@@ -47,8 +47,3 @@ R² score (via sklearn metrics).
 
 # Results
 Visualizations and tabular results highlight historical trends and future forecasts. Key findings are summarized in the notebook.
-
-# Run Jupyter Notebooks:
-daily_forecasting.ipynb
-monthly_forecasting.ipynb
-yearly_forecasting.ipynb
