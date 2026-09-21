@@ -1,49 +1,137 @@
-# Time-series-forecasting-for-Sunspots:
-This project implements time series forecasting using the Facebook Prophet module to predict sunspot activity. Sunspots, temporary phenomena on the Sun's photosphere, exhibit an 11-year solar cycle. The analysis leverages daily, monthly, and yearly sunspot datasets to explore their behavior and forecast future activity.
-Table of Contents
+# Sunspot Time-Series Forecasting
 
-# Table of Content:
-Datasets
-Features
-Modeling and Forecasting
-Results
-How to Run
-Folder Structure
-License
+This project forecasts daily, monthly, and yearly total sunspot activity with [Prophet](https://facebook.github.io/prophet/). It uses historical observations from the World Data Center SILSO and evaluates several model configurations before producing future forecasts at each time scale.
 
-# Introduction:
-Sunspots are areas of intense magnetic activity that appear darker on the Sun's surface. Their prediction is crucial for understanding solar activity and its impacts on Earth. This project aims to build a robust and scalable forecasting model.
+## Project goals
 
-# Datasets:
-The datasets used in this project are available from the World Data Center SILSO.
+- Build reproducible preprocessing pipelines for three SILSO datasets.
+- Represent the approximately 11-year solar cycle with custom Prophet seasonality.
+- Compare linear, flat, and logistic growth assumptions.
+- Test different seasonality periods, Fourier orders, and changepoint settings.
+- Evaluate forecasts on chronological holdout periods.
+- Produce short-, medium-, and longer-horizon forecasts with uncertainty intervals.
 
-Daily Total Sunspot Numbers: SN_d_tot_V2.0.csv
-Monthly Mean Total Sunspot Numbers: SN_m_tot_V2.0.csv
-Yearly Mean Total Sunspot Numbers: SN_y_tot_V2.0.csv
+## Data
 
-# Data Description:
-Each dataset includes columns for date, sunspot counts, and quality indicators.
-Missing values (-1) have been handled during preprocessing.
+The source files come from the [World Data Center SILSO](https://www.sidc.be/SILSO/datafiles):
 
-# Features:
-Forecasts for daily, monthly, and yearly data.
-Flexible codebase that auto-detects time units (days, months, years).
-Tuning of:
-    Growth models (linear, logistic, flat).
-    Seasonality parameters (add_seasonality method).
-    Trend changepoints (n_changepoints, changepoint_prior_scale).
+| Time scale | Source file | Source coverage | Modeling coverage |
+|---|---|---:|---:|
+| Daily | `SN_d_tot_V2.0.csv` | 1818-2022 | 1900-2022 |
+| Monthly | `SN_m_tot_V2.0.csv` | 1749-2022 | 1749-2022 |
+| Yearly | `SN_y_tot_V2.0.csv` | 1700-2021 | 1750-2021 |
 
-# Modeling and Forecasting:
-The model is trained using Facebook Prophet, which fits non-linear trends with seasonality components. Predictions are made for:
-Daily: 100, 200, and 365 days.
-Monthly: 1, 6, and 9 months.
-Yearly: 1, 10, and 20 years.
+The daily model starts in 1900 because all 3,247 unavailable daily observations occur before that year, while the 1900-2022 period contains no `-1` sunspot markers. The yearly model starts in 1750 to keep the date span within the range supported by Prophet's pandas-based datetime calculations.
 
-# Evaluation Metrics:
-Models are evaluated using:
-Mean Absolute Error (MAE)
-Mean Absolute Percentage Error (MAPE)
-R² score (via sklearn metrics).
+## Methodology
 
-# Results:
-Visualizations and tabular results highlight historical trends and future forecasts. Key findings are summarized in the notebook.
+Each notebook follows the same workflow:
+
+1. Load the raw semicolon-delimited SILSO file.
+2. Assign the documented column names and construct timestamps.
+3. Remove unavailable observations and validate dates.
+4. Create a chronological training and holdout split.
+5. Compare five Prophet configurations.
+6. Select the model with the lowest holdout MAE.
+7. Refit the selected configuration on the complete modeling history.
+8. Generate the selected future horizons and an 80% uncertainty interval.
+
+The model comparison covers:
+
+- Linear, flat, and logistic growth
+- Solar-cycle periods of 10.5, 11, and 11.5 years
+- Fourier orders of 5, 10, and 15
+- Between 25 and 75 changepoints
+- Changepoint prior scales from 0.05 to 0.20
+
+## Holdout results
+
+| Time scale | Holdout period | Selected configuration | MAE | Nonzero MAPE | R² |
+|---|---|---|---:|---:|---:|
+| Daily | 365 days | Linear, 11-year cycle, Fourier order 10 | 22.772 | 56.902% | 0.192 |
+| Monthly | 24 months | Linear, 11-year cycle, Fourier order 10 | 12.079 | 505.414% | 0.572 |
+| Yearly | 22 years | Logistic, 11-year cycle, Fourier order 10 | 40.039 | 248.632% | 0.355 |
+
+MAE is the primary selection metric. Ordinary MAPE is undefined when the actual value is zero, so the notebooks calculate MAPE only over nonzero actual observations. It remains highly sensitive when actual counts are close to zero.
+
+## Forecast horizons
+
+| Time scale | Horizons | Point forecasts |
+|---|---|---|
+| Daily | 100, 200, and 365 days | 69.511, 71.491, and 76.735 |
+| Monthly | 1, 6, and 9 months | 53.320, 64.740, and 68.090 |
+| Yearly | 1, 10, and 20 years | 77.688, 21.988, and 33.034 |
+
+These estimates demonstrate Prophet-based time-series modeling. They are not operational space-weather predictions, and uncertainty increases with the forecast horizon.
+
+## Repository structure
+
+```text
+sunspot-time-series-forecasting/
+├── data/
+│   ├── raw/
+│   │   ├── SN_d_tot_V2.0.csv
+│   │   ├── SN_m_tot_V2.0.csv
+│   │   └── SN_y_tot_V2.0.csv
+│   ├── processed/
+│   │   ├── daily_sunspots.csv
+│   │   ├── monthly_sunspots.csv
+│   │   └── yearly_sunspots.csv
+│   └── README.md
+├── notebooks/
+│   ├── 01_daily_sunspot_forecasting.ipynb
+│   ├── 02_monthly_sunspot_forecasting.ipynb
+│   └── 03_yearly_sunspot_forecasting.ipynb
+├── .gitignore
+├── LICENSE
+├── README.md
+└── requirements.txt
+```
+
+## Running the project
+
+### Local environment
+
+```bash
+git clone https://github.com/Lucid1498/Time-series-forecasting-for-Sunspots.git
+cd Time-series-forecasting-for-Sunspots
+python -m venv .venv
+```
+
+Activate the environment on Windows:
+
+```powershell
+.venv\Scripts\Activate.ps1
+```
+
+Install the dependencies:
+
+```bash
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
+
+Open the notebooks in this order:
+
+1. `notebooks/01_daily_sunspot_forecasting.ipynb`
+2. `notebooks/02_monthly_sunspot_forecasting.ipynb`
+3. `notebooks/03_yearly_sunspot_forecasting.ipynb`
+
+The notebooks detect whether they are launched from the repository root or the `notebooks` directory. No machine-specific file paths are required.
+
+### Google Colab
+
+Clone the repository in a Colab session, install `requirements.txt`, and open the notebooks from the cloned directory. The analysis does not require Google Drive mounting.
+
+## Technologies
+
+- Python
+- pandas and NumPy
+- Prophet and CmdStanPy
+- scikit-learn
+- Matplotlib
+- Jupyter Notebook
+
+## License
+
+This project is available under the [MIT License](LICENSE).
