@@ -29,12 +29,13 @@ Each notebook follows the same workflow:
 
 1. Load the raw semicolon-delimited SILSO file.
 2. Assign the documented column names and construct timestamps.
-3. Remove unavailable observations and validate dates.
-4. Create a chronological training and holdout split.
-5. Compare five Prophet configurations.
-6. Select the model with the lowest holdout MAE.
-7. Refit the selected configuration on the complete modeling history.
-8. Generate the selected future horizons and an 80% uncertainty interval.
+3. Infer whether the timestamps are daily, monthly, or yearly from their median spacing.
+4. Remove unavailable observations and validate dates.
+5. Create a chronological training and holdout split.
+6. Compare five Prophet configurations.
+7. Select the model with the lowest holdout MAE.
+8. Refit the selected configuration on the complete modeling history.
+9. Generate the selected future horizons and an 80% uncertainty interval.
 
 The model comparison covers:
 
