@@ -49,9 +49,9 @@ The model comparison covers:
 
 | Time scale | Holdout period | Selected configuration | MAE | Nonzero MAPE | R² |
 |---|---|---|---:|---:|---:|
-| Daily | 365 days | Linear, 11-year cycle, Fourier order 10 | 22.772 | 56.902% | 0.192 |
-| Monthly | 24 months | Linear, 11-year cycle, Fourier order 10 | 12.079 | 505.414% | 0.572 |
-| Yearly | 22 years | Logistic, 11-year cycle, Fourier order 10 | 40.039 | 248.632% | 0.355 |
+| Daily | 365 days | Linear, 11-year cycle, Fourier order 10 | 22.708 | 57.309% | 0.199 |
+| Monthly | 24 months | Linear, 11-year cycle, Fourier order 10 | 12.024 | 522.045% | 0.581 |
+| Yearly | 22 years | Logistic, 11-year cycle, Fourier order 10 | 39.973 | 248.016% | 0.357 |
 
 MAE is the primary selection metric. Ordinary MAPE is undefined when the actual value is zero, so the notebooks calculate MAPE only over nonzero actual observations. It remains highly sensitive when actual counts are close to zero.
 
@@ -59,9 +59,9 @@ MAE is the primary selection metric. Ordinary MAPE is undefined when the actual 
 
 | Time scale | Horizons | Point forecasts |
 |---|---|---|
-| Daily | 100, 200, and 365 days | 69.511, 71.491, and 76.735 |
-| Monthly | 1, 6, and 9 months | 53.320, 64.740, and 68.090 |
-| Yearly | 1, 10, and 20 years | 77.688, 21.988, and 33.034 |
+| Daily | 100, 200, and 365 days | 70.054, 72.183, and 77.515 |
+| Monthly | 1, 6, and 9 months | 53.564, 65.004, and 68.356 |
+| Yearly | 1, 10, and 20 years | 78.443, 22.189, and 33.767 |
 
 These estimates demonstrate Prophet-based time-series modeling. They are not operational space-weather predictions, and uncertainty increases with the forecast horizon.
 
